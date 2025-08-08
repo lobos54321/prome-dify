@@ -7,6 +7,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "demo": "ts-node-dev --respawn --transpile-only src/mockIndex.ts",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
     "db:seed": "ts-node prisma/seed.ts"
