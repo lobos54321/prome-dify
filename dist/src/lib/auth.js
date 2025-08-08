@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { config } from '../config/env.js';
 import { prisma } from '../db/prisma.js';
-import '../types/express.js';
 export const hashPassword = async (password) => {
     return bcrypt.hash(password, 12);
 };
