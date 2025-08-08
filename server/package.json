@@ -1,0 +1,21 @@
+{
+  "name": "prome-dify-server",
+  "version": "1.0.0",
+  "description": "Backend server for Prome-dify",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "lint": "eslint .",
+    "build": "echo 'Build completed'"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "eslint": "^8.57.0"
+  }
+}
