@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  balance   Int      @default(0) // Points/tokens balance
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conversations Conversation[]
+  usageEvents   UsageEvent[]
+
+  @@map("users")
+}
+
+model Conversation {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages Message[]
+  usageEvents UsageEvent[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String   @id @default(cuid())
+  conversationId String
+  role           String   // "user" or "assistant"
+  content        String
+  tokens         Int?     // Token count for this message
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
+}
+
+model UsageEvent {
+  id             String   @id @default(cuid())
+  userId         String
+  conversationId String?
+  tokensUsed     Int
+  balanceAfter   Int
+  type           String   // "chat", "generation", etc.
+  createdAt      DateTime @default(now())
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  conversation Conversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  @@map("usage_events")
+}
+
+model Package {
+  id          String @id @default(cuid())
+  name        String
+  description String
+  tokens      Int    // Number of tokens included
+  priceUsd    Int    // Price in cents
+  stripePriceId String @unique
+  active      Boolean @default(true)
+  createdAt   DateTime @default(now())
+
+  @@map("packages")
+}
