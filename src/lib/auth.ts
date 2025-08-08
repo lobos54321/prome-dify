@@ -3,7 +3,6 @@ import bcrypt from 'bcryptjs';
 import { config } from '../config/env.js';
 import { prisma } from '../db/prisma.js';
 import type { Request, Response, NextFunction } from 'express';
-import '../types/express.js';
 
 export interface JwtPayload {
   userId: string;
