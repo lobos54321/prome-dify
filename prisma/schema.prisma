@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  passwordHash String
+  name        String?
+  credits     Int      @default(1000)
+  role        Role     @default(USER)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  usageRecords Usage[]
+  payments     Payment[]
+
+  @@map("users")
+}
+
+model Usage {
+  id        String    @id @default(cuid())
+  userId    String
+  operation String    // 'chat', 'completion', etc.
+  model     String    // dify model used
+  tokens    Int       // tokens consumed
+  cost      Int       // credits deducted
+  metadata  Json?     // additional data like conversation_id
+  createdAt DateTime  @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("usage_records")
+}
+
+model Payment {
+  id               String        @id @default(cuid())
+  userId           String
+  stripePaymentId  String        @unique
+  amount           Int           // amount in cents
+  currency         String        @default("usd")
+  status           PaymentStatus @default(PENDING)
+  creditsGranted   Int
+  metadata         Json?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  name      String
+  userId    String?
+  isActive  Boolean  @default(true)
+  lastUsed  DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("api_keys")
+}
+
+model DifyModel {
+  id            String  @id @default(cuid())
+  name          String  @unique
+  provider      String  // 'openai', 'anthropic', etc.
+  costPerToken  Float   // cost in credits per token
+  maxTokens     Int?
+  isActive      Boolean @default(true)
+  description   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("dify_models")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
